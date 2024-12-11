@@ -13,20 +13,24 @@ describe("GET Single User", () => {
   it("should return a status 200", () => {
     cy.request("GET", "https://reqres.in/api/users/2").then((response) => {
       expect(response.status).to.eq(200);
-      expect(response.body).to.have.property("page", 2);
-      expect(response.body.data).to.be.an("array");
-      expect(response.body.data[0]).to.have.property("id");
+      expect(response.body.data).to.have.property("id", 2);
+      expect(response.body.data).to.have.property("email");
+      expect(response.body.data).to.have.property("first_name");
+      expect(response.body.data).to.have.property("last_name");
+      expect(response.body.data).to.have.property("avatar");
     });
   });
 });
 
 describe("GET Single User Not Found", () => {
   it("should return a status 404", () => {
-    cy.request("GET", "https://reqres.in/api/users/23").then((response) => {
-      expect(response.status).to.eq(403);
-      expect(response.body).to.have.property("page", 2);
-      expect(response.body.data).to.be.an("array");
-      expect(response.body.data[0]).to.have.property("id");
+    cy.request({
+      method: "GET",
+      url: "https://reqres.in/api/users/23",
+      failOnStatusCode: false, // Allow handling of 404
+    }).then((response) => {
+      expect(response.status).to.eq(404);
+      expect(response.body).to.be.empty;
     });
   });
 });
@@ -35,9 +39,13 @@ describe("GET List <Resource>", () => {
   it("should return a status 200", () => {
     cy.request("GET", "https://reqres.in/api/unknown").then((response) => {
       expect(response.status).to.eq(200);
-      expect(response.body).to.have.property("page", 2);
+      expect(response.body).to.have.property("page");
       expect(response.body.data).to.be.an("array");
       expect(response.body.data[0]).to.have.property("id");
+      expect(response.body.data[0]).to.have.property("name");
+      expect(response.body.data[0]).to.have.property("year");
+      expect(response.body.data[0]).to.have.property("color");
+      expect(response.body.data[0]).to.have.property("pantone_value");
     });
   });
 });
@@ -46,20 +54,24 @@ describe("GET Single <Resource>", () => {
   it("should return a status 200", () => {
     cy.request("GET", "https://reqres.in/api/unknown/2").then((response) => {
       expect(response.status).to.eq(200);
-      expect(response.body).to.have.property("page", 2);
-      expect(response.body.data).to.be.an("array");
-      expect(response.body.data[0]).to.have.property("id");
+      expect(response.body.data).to.have.property("id", 2);
+      expect(response.body.data).to.have.property("name");
+      expect(response.body.data).to.have.property("year");
+      expect(response.body.data).to.have.property("color");
+      expect(response.body.data).to.have.property("pantone_value");
     });
   });
 });
 
 describe("GET Single <Resource> Not Found", () => {
   it("should return a status 404", () => {
-    cy.request("GET", "https://reqres.in/api/unknown/23").then((response) => {
+    cy.request({
+      method: "GET",
+      url: "https://reqres.in/api/unknown/23",
+      failOnStatusCode: false,
+    }).then((response) => {
       expect(response.status).to.eq(404);
-      expect(response.body).to.have.property("page", 2);
-      expect(response.body.data).to.be.an("array");
-      expect(response.body.data[0]).to.have.property("id");
+      expect(response.body).to.be.empty;
     });
   });
 });
@@ -71,7 +83,6 @@ describe("POST Create User", () => {
       job: "developer",
     }).then((response) => {
       expect(response.status).to.eq(201);
-
       expect(response.body).to.have.property("name", "Swan");
       expect(response.body).to.have.property("job", "developer");
       expect(response.body).to.have.property("id");
@@ -87,27 +98,23 @@ describe("PUT Update User", () => {
       job: "zion resident",
     }).then((response) => {
       expect(response.status).to.eq(200);
-
-      expect(response.body).to.have.property("name", "Test");
-      expect(response.body).to.have.property("job", "developer");
-      expect(response.body).to.have.property("id");
-      expect(response.body).to.have.property("createdAt");
+      expect(response.body).to.have.property("name", "morpheus");
+      expect(response.body).to.have.property("job", "zion resident");
+      expect(response.body).to.have.property("updatedAt");
     });
   });
 });
 
 describe("PATCH Update User", () => {
-  it("should update a user and return status 204", () => {
+  it("should update a user and return status 200", () => {
     cy.request("PATCH", "https://reqres.in/api/users/2", {
       name: "morpheus",
       job: "zion resident",
     }).then((response) => {
-      expect(response.status).to.eq(204);
-
-      expect(response.body).to.have.property("name", "Test");
-      expect(response.body).to.have.property("job", "developer");
-      expect(response.body).to.have.property("id");
-      expect(response.body).to.have.property("createdAt");
+      expect(response.status).to.eq(200);
+      expect(response.body).to.have.property("name", "morpheus");
+      expect(response.body).to.have.property("job", "zion resident");
+      expect(response.body).to.have.property("updatedAt");
     });
   });
 });
